@@ -31,7 +31,7 @@ app.get("/students", async (req, res) => {
       .json({ error: "An error occurred while fetching students." });
   }
 });
-app.put('/editStudent/:id', async (req, res) => {
+app.put('/students/:id', async (req, res) => {
     try {
       const studentId = req.params.id;
       const { name, dob } = req.body;
@@ -86,6 +86,33 @@ app.put('/editStudent/:id', async (req, res) => {
     } catch (error) {
       console.error('Error fetching courses:', error);
       res.status(500).json({ error: 'An error occurred while fetching courses.' });
+    }
+  });
+  app.put('/courses/:id', async (req, res) => {
+    try {
+      const courseId = req.params.id;
+      const { name, studentIds } = req.body;
+  
+      const course = await Course.findByPk(courseId);
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+  
+      // Update course name
+      await course.update({ name });
+  
+      // Update associated students
+      if (studentIds && studentIds.length > 0) {
+        const students = await Student.findAll({
+          where: { id: studentIds },
+        });
+        await course.setStudents(students);
+      }
+  
+      res.status(200).json(course);
+    } catch (error) {
+      console.error('Error updating course:', error);
+      res.status(500).json({ error: 'An error occurred while updating the course.' });
     }
   });
   app.post('/courseStudent/:courseId', async (req, res, next) => {

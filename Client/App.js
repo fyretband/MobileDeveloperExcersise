@@ -1,19 +1,60 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import StudentsScreen from './components/Student';
-import AddStudentScreen from './components/addStudent'; // Import AddStudentScreen
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
 
-const Stack = createNativeStackNavigator();
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import StudentsScreen from './components/Student'; 
+import CourseScreen from "./components/Course";
 
-const AppNavigator = () => {
+
+const Tab = createBottomTabNavigator();
+
+
+
+
+
+
+function App() {
   return (
+   
+   <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Students" component={StudentsScreen} />
-        <Stack.Screen name="AddStudent" component={AddStudentScreen} /> {/* Add this line */}
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
 
-export default AppNavigator;
+            if (route.name === "Student") {
+              iconName = focused ? "person" : "person-outline";
+            } else if (route.name === "Course") {
+              iconName = focused ? "book" : "book-outline";
+            }
+
+            return (
+              <Ionicons
+                name={iconName}
+                size={24}
+                color={focused ? "blue" : "gray"}
+              />
+            );
+          },
+        })}
+        tabOptions={{
+          tabBarActiveTintColor: "red",
+          tabBarInactiveTintColor: "gray",
+          tabBarStyle: {
+            display: "flex",
+          },
+        }}
+      >
+        <Tab.Screen name="Student" component={StudentsScreen} />
+        <Tab.Screen name="Course" component={CourseScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
+    </GestureHandlerRootView>
+  
+  );
+}
+
+export default App;
