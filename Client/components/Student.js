@@ -18,11 +18,11 @@ const StudentsScreen = () => {
     const currentDate = new Date();
     const dobDate = new Date(dob);
     const age = currentDate.getFullYear() - dobDate.getFullYear();
-
+  
     if (currentDate.getMonth() < dobDate.getMonth() || (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())) {
       return age - 1;
     }
-
+  
     return age;
   };
 
@@ -38,7 +38,7 @@ const StudentsScreen = () => {
       })
       .catch(error => console.error('Error fetching students:', error));
   }, []);
-
+  
   useEffect(() => {
     if (newStudentDob) {
       // Calculate age based on DOB
@@ -59,22 +59,37 @@ const StudentsScreen = () => {
   const handleStudentAdded = () => {
     // Reload students after adding
     axios.get(`${BASE_URL}/students`)
-      .then(response => setStudents(response.data))
+      .then(response => {
+        const studentsWithAge = response.data.map(student => ({
+          ...student,
+          age: calculateAge(student.dob),
+        }));
+        setStudents(studentsWithAge);
+      })
       .catch(error => console.error('Error fetching students:', error));
+  
     setAddStudentModalVisible(false);
     setNewStudentName('');
     setNewStudentDob('');
     setNewStudentAge('');
   };
-
+  
   const handleStudentUpdated = () => {
     // Reload students after updating
     axios.get(`${BASE_URL}/students`)
-      .then(response => setStudents(response.data))
+      .then(response => {
+        const studentsWithAge = response.data.map(student => ({
+          ...student,
+          age: calculateAge(student.dob),
+        }));
+        setStudents(studentsWithAge);
+      })
       .catch(error => console.error('Error fetching students:', error));
+  
     setEditStudentModalVisible(false);
     setSelectedStudent(null);
   };
+  
 
   const handleCloseModals = () => {
     setAddStudentModalVisible(false);
