@@ -12,18 +12,47 @@ const StudentsScreen = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newStudentName, setNewStudentName] = useState('');
   const [newStudentDob, setNewStudentDob] = useState('');
+  const [newStudentAge, setNewStudentAge] = useState('');
+
+  const calculateAge = (dob) => {
+    const currentDate = new Date();
+    const dobDate = new Date(dob);
+    const age = currentDate.getFullYear() - dobDate.getFullYear();
+
+    if (currentDate.getMonth() < dobDate.getMonth() || (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())) {
+      return age - 1;
+    }
+
+    return age;
+  };
 
   useEffect(() => {
     // Fetch students from backend
     axios.get(`${BASE_URL}/students`)
-      .then(response => setStudents(response.data))
+      .then(response => {
+        const studentsWithAge = response.data.map(student => ({
+          ...student,
+          age: calculateAge(student.dob),
+        }));
+        setStudents(studentsWithAge);
+      })
       .catch(error => console.error('Error fetching students:', error));
   }, []);
 
+  useEffect(() => {
+    if (newStudentDob) {
+      // Calculate age based on DOB
+      const dob = new Date(newStudentDob);
+      const currentDate = new Date();
+      const age = calculateAge(newStudentDob);
+      setNewStudentAge(age.toString());
+    }
+  }, [newStudentDob]);
+
   const handleEditStudent = (student) => {
     setSelectedStudent(student);
-    setNewStudentName(student.name); // Set initial value for name
-    setNewStudentDob(student.dob);   // Set initial value for dob
+    setNewStudentName(student.name);
+    setNewStudentDob(student.dob);
     setEditStudentModalVisible(true);
   };
 
@@ -35,6 +64,7 @@ const StudentsScreen = () => {
     setAddStudentModalVisible(false);
     setNewStudentName('');
     setNewStudentDob('');
+    setNewStudentAge('');
   };
 
   const handleStudentUpdated = () => {
@@ -53,7 +83,7 @@ const StudentsScreen = () => {
   };
 
   const handleAddStudent = () => {
-    if (newStudentName && newStudentDob) {
+    if (newStudentName && newStudentDob && newStudentAge) {
       // Send data to backend
       axios.post(`${BASE_URL}/students`, { name: newStudentName, dob: newStudentDob })
         .then(response => {
@@ -65,7 +95,7 @@ const StudentsScreen = () => {
   };
 
   const handleUpdateStudent = () => {
-    if (selectedStudent && newStudentName && newStudentDob) {
+    if (selectedStudent && newStudentName && newStudentDob && newStudentAge) {
       // Send data to backend
       axios.put(`${BASE_URL}/students/${selectedStudent.id}`, { name: newStudentName, dob: newStudentDob })
         .then(response => {
@@ -79,6 +109,7 @@ const StudentsScreen = () => {
   const renderItem = ({ item }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableCell}>{item.name}</Text>
+      <Text style={styles.tableCell}>{item.age}</Text>
       <Text style={styles.tableCell}>{item.dob}</Text>
       <TouchableOpacity
         style={styles.editButton}
@@ -92,6 +123,7 @@ const StudentsScreen = () => {
   const handleAddStudentButtonPress = () => {
     setNewStudentName('');
     setNewStudentDob('');
+    setNewStudentAge('');
     setAddStudentModalVisible(true);
   };
 
@@ -99,7 +131,8 @@ const StudentsScreen = () => {
     <View style={styles.container}>
       <View style={styles.tableHeader}>
         <Text style={[styles.headerCell, styles.centerText]}>Student Name</Text>
-        <Text style={[styles.headerCell, styles.centerText]}>DOB</Text>
+        <Text style={[styles.headerCell, styles.centerText]}>Age</Text>
+        <Text style={[styles.headerCell, styles.centerText]}>Date Of Birth</Text>
         <Text style={styles.headerCell}></Text>
       </View>
       <FlatList
@@ -130,12 +163,12 @@ const StudentsScreen = () => {
             style={styles.input}
             value={newStudentDob}
             onChangeText={text => setNewStudentDob(text)}
+            placeholder="YYYY-MM-DD"
           />
           <Button title="Add Student" onPress={handleAddStudent} />
           <Button title="Cancel" onPress={handleCloseModals} color="red" />
         </View>
       </Modal>
-
       {/* Edit Student Modal */}
       {selectedStudent && (
         <Modal visible={isEditStudentModalVisible} animationType="slide" onRequestClose={handleCloseModals}>
@@ -151,6 +184,7 @@ const StudentsScreen = () => {
               style={styles.input}
               value={newStudentDob}
               onChangeText={text => setNewStudentDob(text)}
+              placeholder="YYYY-MM-DD"
             />
             <Button title="Update Student" onPress={handleUpdateStudent} />
             <Button title="Cancel" onPress={handleCloseModals} color="red" />
