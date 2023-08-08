@@ -57,7 +57,7 @@ const StudentsScreen = () => {
   };
 
   const handleStudentAdded = () => {
-    // Reload students after adding
+    
     axios.get(`${BASE_URL}/students`)
       .then(response => {
         const studentsWithAge = response.data.map(student => ({
@@ -75,7 +75,7 @@ const StudentsScreen = () => {
   };
   
   const handleStudentUpdated = () => {
-    // Reload students after updating
+    
     axios.get(`${BASE_URL}/students`)
       .then(response => {
         const studentsWithAge = response.data.map(student => ({
@@ -99,7 +99,7 @@ const StudentsScreen = () => {
 
   const handleAddStudent = () => {
     if (newStudentName && newStudentDob && newStudentAge) {
-      // Send data to backend
+      
       axios.post(`${BASE_URL}/students`, { name: newStudentName, dob: newStudentDob })
         .then(response => {
           console.log('Student added:', response.data);
@@ -111,7 +111,7 @@ const StudentsScreen = () => {
 
   const handleUpdateStudent = () => {
     if (selectedStudent && newStudentName && newStudentDob && newStudentAge) {
-      // Send data to backend
+   
       axios.put(`${BASE_URL}/students/${selectedStudent.id}`, { name: newStudentName, dob: newStudentDob })
         .then(response => {
           console.log('Student updated:', response.data);

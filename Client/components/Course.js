@@ -28,13 +28,13 @@ const CourseScreen = () => {
 
   const handleEditCourse = (course) => {
     setSelectedCourse(course);
-    setNewCourseName(course.name); // Set initial value for name
-    setSelectedStudents(course.Students); // Set initial value for selected students
+    setNewCourseName(course.name); 
+    setSelectedStudents(course.Students); 
     setEditCourseModalVisible(true);
   };
 
   const handleCourseAdded = () => {
-    // Reload courses after adding
+    
     axios.get(`${BASE_URL}/courses`)
       .then(response => setCourses(response.data))
       .catch(error => console.error('Error fetching courses:', error));
@@ -44,7 +44,7 @@ const CourseScreen = () => {
   };
 
   const handleCourseUpdated = () => {
-    // Reload courses after updating
+    
     axios.get(`${BASE_URL}/courses`)
       .then(response => setCourses(response.data))
       .catch(error => console.error('Error fetching courses:', error));
@@ -60,7 +60,7 @@ const CourseScreen = () => {
 
   const handleAddCourse = () => {
     if (newCourseName && selectedStudents.length > 0) {
-      // Send data to backend
+      
       axios.post(`${BASE_URL}/courses`, { name: newCourseName, studentIds: selectedStudents.map(student => student.id) })
         .then(response => {
           console.log('Course added:', response.data);
@@ -72,7 +72,7 @@ const CourseScreen = () => {
 
   const handleUpdateCourse = () => {
     if (selectedCourse && newCourseName && selectedStudents.length > 0) {
-      // Send data to backend
+      
       axios.put(`${BASE_URL}/courses/${selectedCourse.id}`, { name: newCourseName, studentIds: selectedStudents.map(student => student.id) })
         .then(response => {
           console.log('Course updated:', response.data);
@@ -259,12 +259,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
+    marginTop: 50
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
-    marginBottom: 20,
+    marginBottom: -20,
   },
   studentCheckbox: {
     flexDirection: 'row',
